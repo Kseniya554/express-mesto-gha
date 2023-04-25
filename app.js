@@ -23,13 +23,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// app.use('/', routes);
-// app.get('/users', (req, res) => {
-//   console.log('');
-//   res.send({message:''});
-
-// })
-
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
   console.log(`App listening on port ${PORT}`)

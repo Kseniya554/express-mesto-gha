@@ -21,7 +21,9 @@ const getUser = (req, res) => {
     res.send({ data: users });
   })
   .catch((e) => {
-    if(e.name == 'Not found') {
+    if (e.name === 'CastError') {
+      res.status(400).send({ message: 'Невалидный id' });
+    } else if(e.name == 'Not found') {
       res.status(404).send({ message: 'Пользователь не найден' });
     } else {
       res.status(500).send({ message: 'Что-то пошло не так' });
