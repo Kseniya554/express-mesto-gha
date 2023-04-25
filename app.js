@@ -10,7 +10,8 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
 const userRouter = require('./routes/user');
-const cardRouter = require('./routes/card')
+const cardRouter = require('./routes/card');
+console.log(cardRouter);
 
 app.use(express.json());
 app.use(userRouter); //Подключаем роутер с пользователями
