@@ -11,7 +11,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
 const { PORT = 3000 } = process.env;
 const userRouter = require('./routes/user');
 const cardRouter = require('./routes/card');
-console.log(cardRouter);
+// console.log(cardRouter);
 
 app.use(express.json());
 app.use(userRouter); //Подключаем роутер с пользователями
@@ -28,3 +28,11 @@ app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
   console.log(`App listening on port ${PORT}`)
 })
+
+//http://localhost:3000
+
+// {
+//   "name": "name",
+//   "about": "about",
+//   "avatar": "avatar"
+// }

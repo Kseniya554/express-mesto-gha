@@ -4,12 +4,12 @@ const { getUsers, getUser, createUser, updateUser, updateAvatar } = require('../
 
 userRouter.get('/users', getUsers)
 
-userRouter.get('/users/:id', getUser)
+userRouter.get('/users/:userid', getUser)
 
 userRouter.post('/users', createUser)
 
-userRouter.patch('/me', express.json(), updateUser);
+userRouter.patch('/users/me', express.json(), updateUser);
 
-userRouter.patch('/me/avatar', express.json(), updateAvatar);
+userRouter.patch('/users/me/avatar', express.json(), updateAvatar);
 
 module.exports = userRouter;
