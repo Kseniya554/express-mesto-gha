@@ -36,10 +36,8 @@ const deleteCard = (req, res) => {
     .catch((e) => {
       if (e.name === 'ValidationError') {
         res.status(400).send({ message: 'Неверно заполнены поля' });
-      } else if (e.name === 'Card not found') {
-        res.status(404).send({ message: 'Карточка не найдена' });
       } else {
-        res.status(500).send({ message: 'Что-то пошло не так' });
+        res.status(404).send({ message: 'Карточка не найдена' });
       }
     });
 };
@@ -56,10 +54,8 @@ const putLike = (req, res) => {
     .catch((e) => {
       if (e.name === 'ValidationError') {
         res.status(400).send({ message: 'Неверно заполнены поля' });
-      } else if (e.name === 'Card not found') {
-        res.status(404).send({ message: 'Карточка не найдена' });
       } else {
-        res.status(500).send({ message: 'Что-то пошло не так' });
+        res.status(404).send({ message: 'Карточка не найдена' });
       }
     });
 };
@@ -76,10 +72,8 @@ const deleteLike = (req, res) => {
     .catch((e) => {
       if (e.name === 'ValidationError') {
         res.status(400).send({ message: 'Неверно заполнены поля' });
-      } else if (e.name === 'Card not found') {
-        res.status(404).send({ message: 'Карточка не найдена' });
       } else {
-        res.status(500).send({ message: 'Что-то пошло не так' });
+        res.status(404).send({ message: 'Карточка не найдена' });
       }
     });
 };
