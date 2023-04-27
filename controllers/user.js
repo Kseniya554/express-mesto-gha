@@ -24,11 +24,12 @@ const getUser = (req, res) => {
     .catch((e) => {
       if (e.name === 'CastError') {
         res.status(400).send({ message: 'Невалидный id' });
-      } else if (e.name === 'Not found') {
-        res.status(404).send({ message: 'Пользователь не найден' });
       } else {
-        res.status(500).send({ message: 'Что-то пошло не так' });
+        res.status(404).send({ message: 'Пользователь не найден' });
       }
+      // else {
+      //   res.status(500).send({ message: 'Что-то пошло не так' });
+      // }
     });
   // User.findById(id).then( user => {
   //   res.send({ data: user });
