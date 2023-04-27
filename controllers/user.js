@@ -4,7 +4,7 @@ const User = require('../models/user');
 const getUsers = (req, res) => {
   User.find()
     .then((users) => {
-      res.send({ data: users });
+      res.status(200).send({ data: users });
     })
     .catch(() => {
       res.status(500).send({ message: 'Что-то пошло не так' });
@@ -19,7 +19,7 @@ const getUser = (req, res) => {
       throw new Error('Not found');
     })
     .then((users) => {
-      res.send({ data: users });
+      res.status(200).send({ data: users });
     })
     .catch((e) => {
       if (e.name === 'CastError') {
@@ -29,7 +29,6 @@ const getUser = (req, res) => {
       } else {
         res.status(500).send({ message: 'Что-то пошло не так' });
       }
-      console.log();
     });
   // User.findById(id).then( user => {
   //   res.send({ data: user });
@@ -72,7 +71,7 @@ const updateUser = (req, res) => {
       if (!user) {
         throw new Error('User not found');
       } else {
-        res.send({ data: user });
+        res.status(200).send({ data: user });
       }
     })
     .catch((e) => {
@@ -87,7 +86,7 @@ const updateUser = (req, res) => {
 };
 
 const updateAvatar = (req, res) => {
-  console.log(req.user);
+  // console.log(req.user);
   const { avatar } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
@@ -98,7 +97,7 @@ const updateAvatar = (req, res) => {
       if (!user) {
         throw new Error('User not found');
       } else {
-        res.send({ data: user });
+        res.status(200).send({ data: user });
       }
     })
     .catch((e) => {

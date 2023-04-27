@@ -4,7 +4,7 @@ const getCards = (req, res) => {
   Card.find()
     .populate(['owner', 'likes'])
     .then((cards) => {
-      res.send({ data: cards });
+      res.status(200).send({ data: cards });
     })
     .catch(() => {
       res.status(500).send({ message: 'Что-то пошло не так' });
@@ -15,7 +15,7 @@ const createCard = (req, res) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => {
-      res.send({ data: card });
+      res.status(200).send({ data: card });
     })
     .catch((e) => {
       if (e.name === 'ValidationError') {
@@ -23,6 +23,7 @@ const createCard = (req, res) => {
       } else {
         res.status(500).send({ message: 'Что-то пошло не так' });
       }
+      console.log(JSON.stringify(e));
     });
 };
 
@@ -30,7 +31,7 @@ const deleteCard = (req, res) => {
   Card.findByIdAndDelete(req.params.cardId)
     .orFail()
     .then((card) => {
-      res.send({ data: card });
+      res.status(200).send({ data: card });
     })
     .catch((e) => {
       if (e.name === 'ValidationError') {
@@ -50,7 +51,7 @@ const putLike = (req, res) => {
       throw new Error('Not found');
     })
     .then((card) => {
-      res.send({ data: card });
+      res.status(200).send({ data: card });
     })
     .catch((e) => {
       if (e.name === 'ValidationError') {
@@ -70,7 +71,7 @@ const deleteLike = (req, res) => {
       throw new Error('Not found');
     })
     .then((card) => {
-      res.send({ data: card });
+      res.status(200).send({ data: card });
     })
     .catch((e) => {
       if (e.name === 'ValidationError') {
