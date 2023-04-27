@@ -15,16 +15,16 @@ const userRouter = require('./routes/user');
 const cardRouter = require('./routes/card');
 // console.log(cardRouter);
 
-app.use(express.json());
-app.use(userRouter);
-app.use(cardRouter);
-
 app.use((req, res, next) => {
   req.user = {
     _id: '6446ae51f7eba23e0438f6f0',
   };
   next();
 });
+
+app.use(express.json());
+app.use(userRouter);
+app.use(cardRouter);
 
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
