@@ -1,21 +1,23 @@
 const express = require('express');
+
 const app = express();
 const mongoose = require('mongoose');
 
-// подключаемся к серверу mongo
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
-  useNewUrlParser: true
-});
-
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
+
+// подключаемся к серверу mongo
+mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
+  useNewUrlParser: true,
+});
+
 const userRouter = require('./routes/user');
 const cardRouter = require('./routes/card');
 // console.log(cardRouter);
 
 app.use(express.json());
-app.use(userRouter); //Подключаем роутер с пользователями
-app.use(cardRouter); //Подключаем роутер с карточками
+app.use(userRouter);
+app.use(cardRouter);
 
 app.use((req, res, next) => {
   req.user = {
@@ -26,10 +28,10 @@ app.use((req, res, next) => {
 
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
-  console.log(`App listening on port ${PORT}`)
-})
+  console.log(`App listening on port ${PORT}`);
+});
 
-//http://localhost:3000
+// http://localhost:3000
 
 // {
 //   "name": "name",
