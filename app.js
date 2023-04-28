@@ -26,6 +26,10 @@ app.use(express.json());
 app.use(userRouter);
 app.use(cardRouter);
 
+app.use('*', (req, res) => {
+  res.status(404).send({ message: 'Запрашиваемый URL не существует' });
+});
+
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
   console.log(`App listening on port ${PORT}`);

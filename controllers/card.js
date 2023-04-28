@@ -29,15 +29,18 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   Card.findByIdAndDelete(req.params.cardId)
-    // .orFail()
+    .orFail()
     .then((card) => {
       res.status(200).send({ data: card });
     })
     .catch((e) => {
-      if (e.name === 'ValidationError') {
+      if (e.name === 'CastError') {
         res.status(400).send({ message: 'Неверно заполнены поля' });
+      }
+      if (e.name === 'DocumentNotFoundError') {
+        res.status(404).send({ message: 'Карточка с таким id не найдена' });
       } else {
-        res.status(404).send({ message: 'Карточка не найдена' });
+        res.status(500).send({ message: 'Ошибка на сервере' });
       }
     });
 };
@@ -52,10 +55,13 @@ const putLike = (req, res) => {
       res.status(200).send({ data: card });
     })
     .catch((e) => {
-      if (e.name === 'ValidationError') {
+      if (e.name === 'CastError') {
         res.status(400).send({ message: 'Неверно заполнены поля' });
+      }
+      if (e.name === 'DocumentNotFoundError') {
+        res.status(404).send({ message: 'Карточка с таким id не найдена' });
       } else {
-        res.status(404).send({ message: 'Карточка не найдена' });
+        res.status(500).send({ message: 'Ошибка на сервере' });
       }
     });
 };
@@ -63,17 +69,20 @@ const putLike = (req, res) => {
 const deleteLike = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .populate(['owner', 'likes'])
-    // .orFail(() => {
-    //   throw new Error('Not found');
-    // })
+    .orFail(() => {
+      throw new Error('Not found');
+    })
     .then((card) => {
       res.status(200).send({ data: card });
     })
     .catch((e) => {
-      if (e.name === 'ValidationError') {
+      if (e.name === 'CastError') {
         res.status(400).send({ message: 'Неверно заполнены поля' });
+      }
+      if (e.name === 'DocumentNotFoundError') {
+        res.status(404).send({ message: 'Карточка с таким id не найдена' });
       } else {
-        res.status(404).send({ message: 'Карточка не найдена' });
+        res.status(500).send({ message: 'Ошибка на сервере' });
       }
     });
 };
