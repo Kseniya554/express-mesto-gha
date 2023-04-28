@@ -68,7 +68,7 @@ const updateUser = (req, res) => {
     })
     .catch((e) => {
       if (e.name === 'CastError') {
-        res.status(400).send({ message: 'Неверно заполнены поля' });
+        res.status(400).send({ message: 'невалидный id' });
       } else if (e.name === 'User not found') {
         res.status(404).send({ message: 'Пользователь не найден' });
       } else {
@@ -93,8 +93,10 @@ const updateAvatar = (req, res) => {
       }
     })
     .catch((e) => {
-      if (e.name === 'CastError') {
+      if (e.name === 'ValidationError') {
         res.status(400).send({ message: 'Неверно заполнены поля' });
+      } else if (e.name === 'CastError') {
+        res.status(400).send({ message: 'невалидный id' });
       } else if (e.name === 'User not found') {
         res.status(404).send({ message: 'Пользователь не найден' });
       } else {
