@@ -4,7 +4,7 @@ const User = require('../models/user');
 const getUsers = (req, res) => {
   User.find()
     .then((users) => {
-      res.status(200).send({ data: users });
+      res.send({ data: users });
     })
     .catch(() => {
       res.status(500).send({ message: 'Что-то пошло не так' });
@@ -24,25 +24,14 @@ const getUser = (req, res) => {
     .catch((e) => {
       if (e.name === 'CastError') {
         res.status(400).send({ message: 'Невалидный id' });
-      } else {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        return;
       }
-      // else {
-      //   res.status(500).send({ message: 'Что-то пошло не так' });
-      // }
+      if (e.name === 'User not found') {
+        res.status(404).send({ message: 'Пользователь не найден' });
+      } else {
+        res.status(500).send({ message: 'Что-то пошло не так' });
+      }
     });
-  // User.findById(id).then( user => {
-  //   res.send({ data: user });
-  // })
-  // .catch((e) => {
-  //   res.status(500).send({ message: 'Что-то пошло не так' });
-  // })
-
-  // if (user) {
-  //   res.send({ data: user});
-  // } else {
-  //   res.status(404).send({ message: 'User not found'});
-  // }
 };
 
 // const getUserMe = ()
@@ -78,7 +67,7 @@ const updateUser = (req, res) => {
       }
     })
     .catch((e) => {
-      if (e.name === 'ValidationError') {
+      if (e.name === 'CastError') {
         res.status(400).send({ message: 'Неверно заполнены поля' });
       } else if (e.name === 'User not found') {
         res.status(404).send({ message: 'Пользователь не найден' });
@@ -104,7 +93,9 @@ const updateAvatar = (req, res) => {
       }
     })
     .catch((e) => {
-      if (e.name === 'User not found') {
+      if (e.name === 'CastError') {
+        res.status(400).send({ message: 'Неверно заполнены поля' });
+      } else if (e.name === 'User not found') {
         res.status(404).send({ message: 'Пользователь не найден' });
       } else {
         res.status(500).send({ message: 'Что-то пошло не так' });

@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "express": "^4.18.2",
-    "lint": "^0.8.19",
     "mongoose": "^7.0.4"
   },
   "keywords": []

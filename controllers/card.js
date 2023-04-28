@@ -15,7 +15,7 @@ const createCard = (req, res) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => {
-      res.status(200).send({ data: card });
+      res.status(201).send({ data: card });
     })
     .catch((e) => {
       if (e.name === 'ValidationError') {
@@ -36,15 +36,13 @@ const deleteCard = (req, res) => {
     .catch((e) => {
       if (e.name === 'CastError') {
         res.status(400).send({ message: 'Неверно заполнены поля' });
-      } else {
-        res.status(404).send({ message: 'Карточка с таким id не найдена' });
+        return;
       }
-      // if (e.name === 'DocumentNotFoundError') {
-      //   res.status(404).send({ message: 'Карточка с таким id не найдена' });
-      // }
-      // else {
-      //   res.status(500).send({ message: 'Ошибка на сервере' });
-      // }
+      if (e.name === 'DocumentNotFoundError') {
+        res.status(404).send({ message: 'Карточка с таким id не найдена' });
+      } else {
+        res.status(500).send({ message: 'Ошибка на сервере' });
+      }
     });
 };
 
@@ -60,14 +58,13 @@ const putLike = (req, res) => {
     .catch((e) => {
       if (e.name === 'CastError') {
         res.status(400).send({ message: 'Неверно заполнены поля' });
-      } else {
-        res.status(404).send({ message: 'Карточка с таким id не найдена' });
+        return;
       }
-      // if (e.name === 'DocumentNotFoundError') {
-      //   res.status(404).send({ message: 'Карточка с таким id не найдена' });
-      // } else {
-      //   res.status(500).send({ message: 'Ошибка на сервере' });
-      // }
+      if (e.name === 'DocumentNotFoundError') {
+        res.status(404).send({ message: 'Карточка с таким id не найдена' });
+      } else {
+        res.status(500).send({ message: 'Ошибка на сервере' });
+      }
     });
 };
 
@@ -83,15 +80,13 @@ const deleteLike = (req, res) => {
     .catch((e) => {
       if (e.name === 'CastError') {
         res.status(400).send({ message: 'Неверно заполнены поля' });
-      } else {
-        res.status(404).send({ message: 'Карточка с таким id не найдена' });
+        return;
       }
-      // if (e.name === 'DocumentNotFoundError') {
-      //   res.status(404).send({ message: 'Карточка с таким id не найдена' });
-      // }
-      // else {
-      //   res.status(500).send({ message: 'Ошибка на сервере' });
-      // }
+      if (e.name === 'DocumentNotFoundError') {
+        res.status(404).send({ message: 'Карточка с таким id не найдена' });
+      } else {
+        res.status(500).send({ message: 'Ошибка на сервере' });
+      }
     });
 };
 
