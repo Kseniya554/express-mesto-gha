@@ -26,7 +26,7 @@ const getUser = (req, res) => {
         res.status(400).send({ message: 'Невалидный id' });
         return;
       }
-      if (e.name === 'User not found') {
+      if (e.message === 'User not found') {
         res.status(404).send({ message: 'Пользователь не найден' });
       } else {
         res.status(500).send({ message: 'Что-то пошло не так' });
@@ -67,9 +67,11 @@ const updateUser = (req, res) => {
       }
     })
     .catch((e) => {
-      if (e.name === 'CastError') {
+      if (e.name === 'ValidationError') {
+        res.status(400).send({ message: 'Неверно заполнены поля' });
+      } else if (e.name === 'CastError') {
         res.status(400).send({ message: 'невалидный id' });
-      } else if (e.name === 'User not found') {
+      } else if (e.message === 'User not found') {
         res.status(404).send({ message: 'Пользователь не найден' });
       } else {
         res.status(500).send({ message: 'Что-то пошло не так' });
@@ -97,7 +99,7 @@ const updateAvatar = (req, res) => {
         res.status(400).send({ message: 'Неверно заполнены поля' });
       } else if (e.name === 'CastError') {
         res.status(400).send({ message: 'невалидный id' });
-      } else if (e.name === 'User not found') {
+      } else if (e.message === 'User not found') {
         res.status(404).send({ message: 'Пользователь не найден' });
       } else {
         res.status(500).send({ message: 'Что-то пошло не так' });
