@@ -58,7 +58,7 @@ const putLike = (req, res) => {
     .catch((e) => {
       if (e.name === 'CastError') {
         res.status(400).send({ message: 'Неверно заполнены поля' });
-      } else if (e.name === 'DocumentNotFoundError') {
+      } else if (e.message === 'Not found') {
         res.status(404).send({ message: 'Карточка с таким id не найдена' });
       } else {
         res.status(500).send({ message: 'Ошибка на сервере' });
@@ -78,7 +78,7 @@ const deleteLike = (req, res) => {
     .catch((e) => {
       if (e.name === 'CastError') {
         res.status(400).send({ message: 'Неверно заполнены поля' });
-      } else if (e.name === 'DocumentNotFoundError') {
+      } else if (e.message === 'Not found') {
         res.status(404).send({ message: 'Карточка с таким id не найдена' });
       } else {
         res.status(500).send({ message: 'Ошибка на сервере' });
