@@ -26,7 +26,7 @@ const getUser = (req, res) => {
         res.status(400).send({ message: 'Невалидный id' });
         return;
       }
-      if (e.message === 'User not found') {
+      if (e.message === 'Not found') {
         res.status(404).send({ message: 'Пользователь не найден' });
       } else {
         res.status(500).send({ message: 'Что-то пошло не так' });
