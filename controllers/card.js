@@ -23,26 +23,31 @@ const createCard = (req, res) => {
       } else {
         res.status(404).send({ message: 'Что-то пошло не так' });
       }
-      console.log(JSON.stringify(e));
+      // console.log(JSON.stringify(e));
     });
 };
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   Card.findByIdAndDelete(req.params.cardId)
     .orFail()
     .then((card) => {
+      if (!card) {
+        res.status(404).send({ message: 'Карточка с таким id не найдена' });
+        return;
+      }
+      If (`${card.owner}` !== req.user._id) {
+        res.status(404).send({ message: 'Карточку нельзя удалить' });
+        // return;
+      }
       res.status(200).send({ data: card });
+
     })
     .catch((e) => {
       if (e.name === 'CastError') {
         res.status(400).send({ message: 'Неверно заполнены поля' });
         return;
       }
-      if (e.name === 'DocumentNotFoundError') {
-        res.status(404).send({ message: 'Карточка с таким id не найдена' });
-      } else {
-        res.status(500).send({ message: 'Ошибка на сервере' });
-      }
+      next(e);
     });
 };
 

@@ -1,5 +1,10 @@
 // const users  = require('../models/user');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const { generateToken } = require('../utils/token');
+
+const SOLT_ROUNDS = 10;
 
 const getUsers = (req, res) => {
   User.find()
@@ -10,6 +15,12 @@ const getUsers = (req, res) => {
       res.status(500).send({ message: 'Что-то пошло не так' });
     });
   // res.send({ data: users });
+};
+
+const getUserMe = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => res.status(200).send(user))
+    .catch(next);
 };
 
 const getUser = (req, res) => {
@@ -36,20 +47,71 @@ const getUser = (req, res) => {
 
 // const getUserMe = ()
 
-const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => {
-      res.status(201).send({ data: user });
-    })
-    .catch((e) => {
-      if (e.name === 'ValidationError') {
-        res.status(400).send({ message: 'Неверно заполнены поля' });
-      } else {
-        res.status(500).send({ message: 'Что-то пошло не так' });
-      }
-      // console.log(JSON.stringify(e))
+const createUser = async (req, res) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+
+  if (!email || !password) {
+    res.status(400).send({ message: 'Не передан email или password' });
+    return;
+  }
+
+  try {
+    // const userAdmin = await User.findOne({ email });
+    // if (userAdmin) {
+    //   res.status(409).send({ message: 'Пользователь уже существует' });
+    //   return;
+    // }
+    const hash = await bcrypt.hash(password, SOLT_ROUNDS);
+
+    const newUser = await User.findOne({
+      name, about, avatar, email, password: hash,
     });
+    if (newUser) {
+      res.status(201).send({
+        name: newUser.name,
+        about: newUser.about,
+        avatar: newUser.avatar,
+        _id: newUser._id,
+        email: newUser.email,
+      });
+      return;
+    }
+  } catch (e) {
+    if (e.name === 'ValidationError') {
+      res.status(400).send({ message: 'Невалидный email или password' });
+      return;
+    }
+    if (e.code === 11000) {
+      res.status(409).send({ message: 'Пользователь уже существует' });
+      return;
+    }
+    res.status(500).send({ message: 'Что-то пошло не так' });
+  }
+  // хешируем пароль
+  // bcrypt.hash(req.body.password, 10)
+  //   .then((hash) => User.create({
+  //     name: req.body.name,
+  //     about: req.body.about,
+  //     avatar: req.body.avatar,
+  //     email: req.body.email,
+  //     password: hash, // записываем хеш в базу
+  //   }))
+  // .then((user) => {
+  //   res.status(201).send({
+  //     _id: user._id,
+  //     email: user.email,
+  //   });
+  // })
+  // .catch((e) => {
+  //   if (e.name === 'ValidationError') {
+  //     res.status(400).send({ message: 'Неверно заполнены поля' });
+  //   } else {
+  //     res.status(500).send({ message: 'Что-то пошло не так' });
+  //   }
+  //   // console.log(JSON.stringify(e))
+  // });
 };
 
 const updateUser = (req, res) => {
@@ -107,6 +169,65 @@ const updateAvatar = (req, res) => {
     });
 };
 
+const login = async (req, res) => {
+  // const {
+  //   name, about, avatar, email, password,
+  // } = req.body;
+
+  // if (!email || !password) {
+  //   res.status(401).send({ message: 'Не правильные email или password' });
+  // }
+  // try {
+  //   const userAdmin = await User.findOne({ email }).select('+password');
+  //   if (!userAdmin) {
+  //     res.status(409).send({ message: 'Пользователь уже существует' });
+  //     return;
+  //   }
+  //   const matched = await bcrypt.compare(password, userAdmin.password)
+  //   if(!matched) {
+  //   res.status(401).send({ message: 'Не правильные email или password' });
+  //   return;
+  //   }
+  //   const token = generateToken({ _id: userAdmin._id, email: userAdmin.email })
+  //   res.status(200).send({ message: 'Добро пожаловать', token });
+  //   return;
+  // } catch {
+  //   res.status(500).send({ message: 'Что-то пошло не так' });
+  // }
+  const { email, password } = req.body;
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+    // создадим токен
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      // вернём токен
+      res.send({ token });
+    })
+    .then((user) => {
+      if (!user) {
+      // пользователь не найден — отклоняем промис
+        // с ошибкой и переходим в блок catch
+        return Promise.reject(new Error('Неправильные почта или пароль'));
+      }
+      // пользователь найден
+      // сравниваем переданный пароль и хеш из базы
+      return bcrypt.compare(password, user.password);
+    })
+    .then((matched) => {
+      if (!matched) {
+        // хеши не совпали — отклоняем промис
+        return Promise.reject(new Error('Неправильные почта или пароль'));
+      }
+      // аутентификация успешна
+      res.send({ message: 'Всё верно!' });
+    })
+    .catch((err) => {
+      // возвращаем ошибку аутентификации
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
+};
+
 module.exports = {
-  getUsers, getUser, createUser, updateUser, updateAvatar,
+  getUsers, getUser, createUser, updateUser, updateAvatar, login, getUserMe,
 };
