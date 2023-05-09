@@ -1,6 +1,6 @@
 // const users  = require('../models/user');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+// const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { generateToken } = require('../utils/token');
 
@@ -78,12 +78,12 @@ const createUser = async (req, res) => {
       });
       return;
     }
-  } catch (e) {
-    if (e.name === 'ValidationError') {
+  } catch (err) {
+    if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Невалидный email или password' });
       return;
     }
-    if (e.code === 11000) {
+    if (err.code === 11000) {
       res.status(409).send({ message: 'Пользователь уже существует' });
       return;
     }
@@ -198,7 +198,7 @@ const login = async (req, res) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
     // создадим токен
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      const token = generateToken({ _id: user._id });
       // вернём токен
       res.send({ token });
     })

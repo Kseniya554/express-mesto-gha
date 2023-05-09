@@ -28,6 +28,8 @@ app.post('/signin', login);
 app.post('/signup', createUser);
 
 app.use(express.json());
+// авторизация
+app.use(auth);
 app.use(auth, userRouter);
 app.use(auth, cardRouter);
 app.use(helmet());
