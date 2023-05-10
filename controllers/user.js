@@ -169,62 +169,77 @@ const updateAvatar = (req, res) => {
     });
 };
 
-const login = async (req, res) => {
-  // const {
-  //   name, about, avatar, email, password,
-  // } = req.body;
+// const login = async (req, res) => {
+// const {
+//   name, about, avatar, email, password,
+// } = req.body;
 
-  // if (!email || !password) {
-  //   res.status(401).send({ message: 'Не правильные email или password' });
-  // }
-  // try {
-  //   const userAdmin = await User.findOne({ email }).select('+password');
-  //   if (!userAdmin) {
-  //     res.status(409).send({ message: 'Пользователь уже существует' });
-  //     return;
-  //   }
-  //   const matched = await bcrypt.compare(password, userAdmin.password)
-  //   if(!matched) {
-  //   res.status(401).send({ message: 'Не правильные email или password' });
-  //   return;
-  //   }
-  //   const token = generateToken({ _id: userAdmin._id, email: userAdmin.email })
-  //   res.status(200).send({ message: 'Добро пожаловать', token });
-  //   return;
-  // } catch {
-  //   res.status(500).send({ message: 'Что-то пошло не так' });
-  // }
+// if (!email || !password) {
+//   res.status(401).send({ message: 'Не правильные email или password' });
+// }
+// try {
+//   const userAdmin = await User.findOne({ email }).select('+password');
+//   if (!userAdmin) {
+//     res.status(409).send({ message: 'Пользователь уже существует' });
+//     return;
+//   }
+//   const matched = await bcrypt.compare(password, userAdmin.password)
+//   if(!matched) {
+//   res.status(401).send({ message: 'Не правильные email или password' });
+//   return;
+//   }
+//   const token = generateToken({ _id: userAdmin._id, email: userAdmin.email })
+//   res.status(200).send({ message: 'Добро пожаловать', token });
+//   return;
+// } catch {
+//   res.status(500).send({ message: 'Что-то пошло не так' });
+// }
+
+//   const { email, password } = req.body;
+//   return User.findUserByCredentials(email, password)
+//     .then((user) => {
+//     // создадим токен
+//       const token = generateToken({ _id: user._id });
+//       // вернём токен
+//       res.send({ token });
+//     })
+//     .then((user) => {
+//       if (!user) {
+//       // пользователь не найден — отклоняем промис
+//         // с ошибкой и переходим в блок catch
+//         return Promise.reject(new Error('Неправильные почта или пароль'));
+//       }
+//       // пользователь найден
+//       // сравниваем переданный пароль и хеш из базы
+//       return bcrypt.compare(password, user.password);
+//     })
+//     .then((matched) => {
+//       if (!matched) {
+//         // хеши не совпали — отклоняем промис
+//         return Promise.reject(new Error('Неправильные почта или пароль'));
+//       }
+//       // аутентификация успешна
+//       res.send({ message: 'Всё верно!' });
+//     })
+//     .catch((err) => {
+//       // возвращаем ошибку аутентификации
+//       res
+//         .status(401)
+//         .send({ message: err.message });
+//     });
+// };
+
+const login = (req, res) => {
   const { email, password } = req.body;
+
   return User.findUserByCredentials(email, password)
     .then((user) => {
-    // создадим токен
-      const token = generateToken({ _id: user._id });
-      // вернём токен
-      res.send({ token });
-    })
-    .then((user) => {
-      if (!user) {
-      // пользователь не найден — отклоняем промис
-        // с ошибкой и переходим в блок catch
-        return Promise.reject(new Error('Неправильные почта или пароль'));
-      }
-      // пользователь найден
-      // сравниваем переданный пароль и хеш из базы
-      return bcrypt.compare(password, user.password);
-    })
-    .then((matched) => {
-      if (!matched) {
-        // хеши не совпали — отклоняем промис
-        return Promise.reject(new Error('Неправильные почта или пароль'));
-      }
-      // аутентификация успешна
-      res.send({ message: 'Всё верно!' });
+      res.send({
+        token: generateToken({ _id: user._id }),
+      });
     })
     .catch((err) => {
-      // возвращаем ошибку аутентификации
-      res
-        .status(401)
-        .send({ message: err.message });
+      res.status(401).send({ message: err.message });
     });
 };
 
