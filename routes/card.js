@@ -17,7 +17,7 @@ const validationCreateCard = celebrate({
 });
 
 const validationCardId = celebrate({
-  params: Joi.object().keys({ cardId: Joi.string().alphanum().length(24) }),
+  params: Joi.object().keys({ cardId: Joi.string().required().hex().length(24) }),
 });
 
 cardRouter.get('/cards', getCards);
@@ -30,4 +30,4 @@ cardRouter.put('/cards/:cardId/likes', validationCardId, putLike);
 
 cardRouter.delete('/cards/:cardId/likes', validationCardId, deleteLike);
 
-module.exports = cardRouter;
+module.exports = { cardRouter, regex };

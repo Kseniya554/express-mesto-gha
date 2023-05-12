@@ -1,17 +1,18 @@
 const Card = require('../models/card');
 
-const getCards = (req, res) => {
+const BadRequestError = require('../errors/BadRequestError ');
+const NotFoundError = require('../errors/NotFoundError');
+
+const getCards = (req, res, next) => {
   Card.find()
     .populate(['owner', 'likes'])
     .then((cards) => {
       res.status(200).send({ data: cards });
     })
-    .catch(() => {
-      res.status(500).send({ message: 'Что-то пошло не так' });
-    });
+    .catch(next);
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => {
@@ -19,9 +20,9 @@ const createCard = (req, res) => {
     })
     .catch((e) => {
       if (e.name === 'ValidationError') {
-        res.status(400).send({ message: 'Неверно заполнены поля' });
+        next(new BadRequestError('Неверно заполнены поля'));
       } else {
-        res.status(404).send({ message: 'Что-то пошло не так' });
+        next(new NotFoundError('Что-то пошло не так'));
       }
       // console.log(JSON.stringify(e));
     });
@@ -32,59 +33,53 @@ const deleteCard = (req, res, next) => {
     .orFail()
     .then((card) => {
       if (!card) {
-        res.status(404).send({ message: 'Карточка с таким id не найдена' });
+        next(new NotFoundError('Карточка с таким id не найдена'));
       } else if (card.owner.toString() !== req.user._id) {
-        res.status(404).send({ message: 'Карточку нельзя удалить' });
-      } else {
-        res.status(200).send({ data: card });
+        next(new NotFoundError('Карточку нельзя удалить'));
       }
+      return card.deleteOne()
+        .then(() => res.status(200).send({ data: card }));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Неверно заполнены поля' });
+        next(new BadRequestError('Неверно заполнены поля'));
         return;
       }
-      next();
+      next(err);
     });
 };
 
-const putLike = (req, res) => {
+const putLike = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .populate(['owner', 'likes'])
     .orFail(() => {
-      throw new Error('Not found');
+      throw new NotFoundError('Not found');
     })
     .then((card) => {
       res.status(200).send({ data: card });
     })
-    .catch((e) => {
-      if (e.name === 'CastError') {
-        res.status(400).send({ message: 'Неверно заполнены поля' });
-      } else if (e.message === 'Not found') {
-        res.status(404).send({ message: 'Карточка с таким id не найдена' });
-      } else {
-        res.status(500).send({ message: 'Ошибка на сервере' });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Неверно заполнены поля'));
       }
+      next(err);
     });
 };
 
-const deleteLike = (req, res) => {
+const deleteLike = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .populate(['owner', 'likes'])
     .orFail(() => {
-      throw new Error('Not found');
+      throw new NotFoundError('Not found');
     })
     .then((card) => {
       res.status(200).send({ data: card });
     })
-    .catch((e) => {
-      if (e.name === 'CastError') {
-        res.status(400).send({ message: 'Неверно заполнены поля' });
-      } else if (e.message === 'Not found') {
-        res.status(404).send({ message: 'Карточка с таким id не найдена' });
-      } else {
-        res.status(500).send({ message: 'Ошибка на сервере' });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Неверно заполнены поля'));
       }
+      next(err);
     });
 };
 
