@@ -29,12 +29,10 @@ const createCard = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  Card.findByIdAndDelete(req.params.cardId)
+  Card.findById(req.params.cardId)
     .orFail()
     .then((card) => {
-      if (!card) {
-        next(new NotFoundError('Карточка с таким id не найдена'));
-      } else if (card.owner.toString() !== req.user._id) {
+      if (`${card.owner}` !== req.user._id) {
         next(new NotFoundError('Карточку нельзя удалить'));
       }
       return card.deleteOne()
@@ -42,7 +40,7 @@ const deleteCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Неверно заполнены поля'));
+        next(new BadRequestError('Невалидный id'));
         return;
       }
       next(err);

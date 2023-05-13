@@ -22,6 +22,9 @@ const userRouter = require('./routes/user');
 const cardRouter = require('./routes/card');
 const { login, createUser } = require('./controllers/user');
 // console.log(cardRouter);
+const NotFoundError = require('./errors/NotFoundError');
+
+app.use(express.json());
 
 app.post('/signin', express.json(), celebrate({
   body: Joi.object().keys({
@@ -39,7 +42,6 @@ app.post('/signup', express.json(), celebrate({
   }),
 }), createUser);
 
-app.use(express.json());
 app.use(helmet());
 // авторизация
 app.use(auth, userRouter);
@@ -61,8 +63,8 @@ app.use((err, req, res, next) => {
   next();
 });
 
-app.use('*', auth, (req, res) => {
-  res.status(404).send({ message: 'Запрашиваемый URL не существует' });
+app.use('*', auth, (req, res, next) => {
+  next(new NotFoundError('Запрашиваемый URL не существует'));
 });
 
 app.listen(PORT, () => {

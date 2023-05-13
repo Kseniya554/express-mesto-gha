@@ -6,6 +6,7 @@ const { generateToken } = require('../utils/token');
 const BadRequestError = require('../errors/BadRequestError ');
 const NotFoundError = require('../errors/NotFoundError');
 const ConflictError = require('../errors/ConflictError ');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const SOLT_ROUNDS = 10;
 
@@ -36,6 +37,7 @@ const getUser = (req, res, next) => {
     .catch((e) => {
       if (e.name === 'CastError') {
         next(new BadRequestError('Невалидный id'));
+        return;
       }
       next(e);
     });
@@ -71,7 +73,7 @@ const createUser = async (req, res, next) => {
       next(new ConflictError('Пользователь уже существует'));
       return;
     }
-    res.status(500).send({ message: 'Что-то пошло не так' });
+    next(err);
   }
 };
 
@@ -121,7 +123,7 @@ const updateAvatar = (req, res, next) => {
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -131,7 +133,11 @@ const login = (req, res) => {
       });
     })
     .catch((err) => {
-      res.status(401).send({ message: err.message });
+      if (err.name === 'AuthorizedError') {
+        next(new UnauthorizedError('Неправильные почта или пароль'));
+        return;
+      }
+      next(err);
     });
 };
 
