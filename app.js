@@ -6,7 +6,7 @@ const app = express();
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const { celebrate, Joi, errors } = require('celebrate');
-const { regex } = require('./routes/card');
+const { cardRouter, regex } = require('./routes/card');
 
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
@@ -19,7 +19,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
 });
 
 const userRouter = require('./routes/user');
-const cardRouter = require('./routes/card');
 const { login, createUser } = require('./controllers/user');
 // console.log(cardRouter);
 const NotFoundError = require('./errors/NotFoundError');
@@ -47,6 +46,9 @@ app.use(helmet());
 app.use(auth, userRouter);
 app.use(auth, cardRouter);
 
+app.use('*', auth, (req, res, next) => {
+  next(new NotFoundError('Запрашиваемый URL не существует'));
+});
 app.use(errors());
 app.use((err, req, res, next) => {
   // если у ошибки нет статуса, выставляем 500
@@ -61,10 +63,6 @@ app.use((err, req, res, next) => {
         : message,
     });
   next();
-});
-
-app.use('*', auth, (req, res, next) => {
-  next(new NotFoundError('Запрашиваемый URL не существует'));
 });
 
 app.listen(PORT, () => {

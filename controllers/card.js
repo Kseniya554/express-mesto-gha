@@ -2,6 +2,7 @@ const Card = require('../models/card');
 
 const BadRequestError = require('../errors/BadRequestError ');
 const NotFoundError = require('../errors/NotFoundError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 const getCards = (req, res, next) => {
   Card.find()
@@ -18,22 +19,22 @@ const createCard = (req, res, next) => {
     .then((card) => {
       res.status(201).send({ data: card });
     })
-    .catch((e) => {
-      if (e.name === 'ValidationError') {
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
         next(new BadRequestError('Неверно заполнены поля'));
-      } else {
-        next(new NotFoundError('Что-то пошло не так'));
+        return;
       }
+      next(err);
       // console.log(JSON.stringify(e));
     });
 };
 
 const deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
-    .orFail()
+    .orFail(() => new NotFoundError('Карточка не найдена'))
     .then((card) => {
       if (`${card.owner}` !== req.user._id) {
-        next(new NotFoundError('Карточку нельзя удалить'));
+        next(new ForbiddenError('Нет доступа на удаление карточки'));
       }
       return Card.deleteOne()
         .then(() => res.status(200).send({ data: card }));
