@@ -35,7 +35,7 @@ const deleteCard = (req, res, next) => {
       if (`${card.owner}` !== req.user._id) {
         next(new NotFoundError('Карточку нельзя удалить'));
       }
-      return card.deleteOne()
+      return Card.deleteOne()
         .then(() => res.status(200).send({ data: card }));
     })
     .catch((err) => {
