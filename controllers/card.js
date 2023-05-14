@@ -31,8 +31,11 @@ const createCard = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
-    .orFail(() => new NotFoundError('Карточка не найдена'))
+    // .orFail(() => new NotFoundError('Карточка не найдена'))
     .then((card) => {
+      if (!card) {
+        throw new NotFoundError('Такой карточки нет');
+      }
       if (`${card.owner}` !== req.user._id) {
         next(new ForbiddenError('Нет доступа на удаление карточки'));
       }

@@ -6,7 +6,6 @@ const { generateToken } = require('../utils/token');
 const BadRequestError = require('../errors/BadRequestError ');
 const NotFoundError = require('../errors/NotFoundError');
 const ConflictError = require('../errors/ConflictError ');
-const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const SOLT_ROUNDS = 10;
 
@@ -132,13 +131,7 @@ const login = (req, res, next) => {
         token: generateToken({ _id: user._id }),
       });
     })
-    .catch((err) => {
-      if (err.name === 'AuthorizedError') {
-        next(new UnauthorizedError('Неправильные почта или пароль'));
-        return;
-      }
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports = {
