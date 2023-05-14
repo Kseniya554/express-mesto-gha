@@ -37,7 +37,7 @@ const deleteCard = (req, res, next) => {
         throw new NotFoundError('Такой карточки нет');
       }
       if (`${card.owner}` !== req.user._id) {
-        next(new ForbiddenError('Нет доступа на удаление карточки'));
+        throw new ForbiddenError('Нет доступа на удаление карточки');
       }
       return Card.deleteOne()
         .then(() => res.status(200).send({ data: card }));
@@ -63,6 +63,7 @@ const putLike = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Неверно заполнены поля'));
+        return;
       }
       next(err);
     });
@@ -80,6 +81,7 @@ const deleteLike = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Неверно заполнены поля'));
+        return;
       }
       next(err);
     });

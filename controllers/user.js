@@ -93,6 +93,7 @@ const updateUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Неверно заполнены поля'));
+        return;
       }
       next(err);
     });
